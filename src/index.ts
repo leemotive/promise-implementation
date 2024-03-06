@@ -196,7 +196,7 @@ function innerResolver(promise2: MyPromise, resolve: AnyFunction, reject: AnyFun
       if (typeof then === 'function') {
         then.call(
           x,
-          race(y => innerResolver(promise2, resolve, reject, y)),
+          race(y => queueMicrotask(() => innerResolver(promise2, resolve, reject, y))),
           race(r => reject(r)),
         );
       } else {
