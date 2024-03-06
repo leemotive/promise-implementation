@@ -29,7 +29,7 @@ class MyPromise<V = any, R = any> {
     }
 
     const callbacks = this.#onFulfilledCallbacks.splice(0);
-    callbacks.forEach(fn => queueMicrotask(() => fn(this.#value)));
+    queueMicrotask(() => callbacks.forEach(fn => fn(this.#value)));
   };
 
   #reject = (reason?: any) => {
@@ -42,7 +42,7 @@ class MyPromise<V = any, R = any> {
     }
 
     const callbacks = this.#onRejectedCallbacks.splice(0);
-    callbacks.forEach(fn => queueMicrotask(() => fn(this.#reason)));
+    queueMicrotask(() => callbacks.forEach(fn => fn(this.#reason)));
   };
 
   constructor(executor: PromiseExecutor<V, R>) {
@@ -83,6 +83,9 @@ class MyPromise<V = any, R = any> {
   }
 
   static resolve<S = any>(value?: S) {
+    if (value instanceof MyPromise) {
+      return value;
+    }
     return new MyPromise<S>(resolve => {
       resolve(value!);
     });
